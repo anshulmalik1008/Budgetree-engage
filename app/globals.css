@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-forest: #102b27;
+  --color-ink: #19332e;
+  --color-muted: #536760;
+  --color-canvas: #f3f6f2;
+  --color-line: #dce6dd;
+  --color-mint: #dceee3;
+  --color-gold: #f6dc93;
+}
+
+body { @apply bg-canvas text-ink antialiased; font-family: system-ui, sans-serif; }
+button, summary { @apply cursor-pointer; }
+:focus-visible { @apply outline-2 outline-offset-4 outline-emerald-700; }
+.card { @apply rounded-2xl border border-line bg-white p-5; }
+.button { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-forest px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-900; }
+.button-light { @apply bg-mint text-forest hover:bg-emerald-200; }
+.button-gold { @apply bg-gold text-forest hover:bg-amber-200; }
+.field { @apply grid gap-2 text-sm font-semibold; }
+.field input, .field select, .field textarea { @apply w-full rounded-xl border border-line bg-white p-3 font-normal; }
+.hero { background: radial-gradient(ellipse at 92% 5%, #55896a 0, transparent 52%), linear-gradient(120deg, #102b27, #235244); }
+dialog::backdrop { background: #102b2799; }
+
+:root { color-scheme: light; }
+body { background-image: radial-gradient(ellipse at 100% 0, #e3eee5, transparent 52%); }
+.card { box-shadow: 0 8px 26px -20px #102b2759; }
+.dashboard-hero { min-height: 320px; }
+.hero-orbit {
+  @apply pointer-events-none absolute -right-24 -bottom-36 hidden size-[29rem] place-items-center rounded-full text-gold sm:grid;
+  background: repeating-radial-gradient(circle, #fae1a03d 0 1px, transparent 2px 24px);
+}
+.module-hero { min-height: 180px; }
+.hero-link { @apply inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/35 bg-white/10 px-4 text-sm font-semibold hover:bg-white/20; }
+.panel-icon { @apply inline-grid size-10 shrink-0 place-items-center rounded-xl bg-mint p-2 text-forest; }
+.reward-art { background: radial-gradient(circle at 75% 15%, #f7e5a6, transparent 55%), linear-gradient(135deg, #d8ece0, #b9d6c8); }
+.reward-art[data-category="Travel"] { background: radial-gradient(circle at 77% 10%, #e7f2f6, transparent 60%), linear-gradient(135deg, #b5d4dc, #bad7df); }
+.reward-art[data-category="Lifestyle"] { background: radial-gradient(circle at 75% 15%, #fff2cb, transparent 55%), linear-gradient(135deg, #e8d7ae, #e8cda1); }
+
+/* Workspace colour system */
+@theme {
+  --color-forest: #211847;
+  --color-ink: #201a38;
+  --color-muted: #564f70;
+  --color-canvas: #f7f6fc;
+  --color-line: #e6e0f2;
+  --color-mint: #ede6ff;
+  --color-gold: #ffe1a7;
+}
+body { background-image: radial-gradient(ellipse at 100% 0, #eee6ff, transparent 56%); }
+:focus-visible { outline-color: #7243d5; }
+.primary-rail { background: linear-gradient(162deg,#211847,#35206c 53%,#191432); }
+.primary-item[aria-current] { background: linear-gradient(100deg,#7041db,#5337a0); color:#fff; }
+.section-rail { background: linear-gradient(180deg,#fff,#faf8ff); }
+.section-item[aria-current] { background: #eee7ff; color: #5228a5; box-shadow: inset 3px 0 #7c4de5; }
+.card { box-shadow: 0 14px 32px -25px #331a7266; }
+.button { background: linear-gradient(105deg,#6033c7,#46288f); }
+.button:hover { background: linear-gradient(105deg,#5124b6,#382079); }
+.button-light,.button-light:hover { background: #eee6ff; color: #472688; }
+.button-light:hover { background: #e3d5ff; }
+.button-gold,.button-gold:hover { background: #ffe1a7; color: #30214b; }
+.button-gold:hover { background: #ffd68a; }
+.hero { background: radial-gradient(at 92% 10%,#8a48ef 0,transparent 52%),linear-gradient(125deg,#1e1546,#3d267b 62%,#4d27a1); }
+.module-hero[data-section="people"],.module-hero[data-section="attendance"] { background: radial-gradient(at 92% 5%,#267b87,transparent 60%),linear-gradient(125deg,#15284b,#215667); }
+.module-hero[data-section="payroll"],.module-hero[data-section="resources"] { background: radial-gradient(at 92% 5%,#525fc9,transparent 60%),linear-gradient(125deg,#232044,#363985); }
+.module-hero[data-section="rewards"] { background: radial-gradient(at 92% 5%,#a34d91,transparent 60%),linear-gradient(125deg,#31173d,#5e2a72); }
+.hero-orbit { background: repeating-radial-gradient(circle,#e6d9ff55 0 1px,transparent 2px 24px); }
+.hero-feature { background: radial-gradient(at 85% 10%,#4a3578,#251950 75%); }
+.metric-tile { background: linear-gradient(150deg,#fff,#f2ebff); }
+.metric-tile:nth-child(2) { background: linear-gradient(150deg,#fff,#e7f5fa); }
+.metric-tile:nth-child(3) { background: linear-gradient(150deg,#fff,#fff1db); }
+.reward-art { background: radial-gradient(circle at 75% 15%,#fff0ca,transparent 55%),linear-gradient(135deg,#e5d9fd,#d3c0ff); }
+.reward-art[data-category="Travel"] { background: linear-gradient(135deg,#cee8fc,#d9e1ff); }
+.reward-art[data-category="Lifestyle"] { background: linear-gradient(135deg,#fae1f0,#eed5ff); }
