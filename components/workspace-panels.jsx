@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowUpRight, BookOpen, CalendarDays, ClipboardList, Gift, Sparkles, Users, Plane, ShoppingBag, Headphones } from 'lucide-react';
+import { ArrowUpRight, BookOpen, CalendarDays, ClipboardList, Gift, Sparkles, Users } from 'lucide-react';
 import { href, navigation } from '../lib/workspace';
 
 import { hrPages } from '../lib/hr-pages';
@@ -37,22 +37,24 @@ const shortcuts = [
 
 export function DashboardHero({ data, onRecognise }) {
   return (
-    <section className="hero dashboard-hero relative isolate grid items-center gap-7 overflow-hidden md:grid-cols-[minmax(0,1fr)_minmax(180px,245px)] rounded-[28px] px-6 py-9 text-white sm:px-10 lg:py-14">
-      <div className="hero-orbit" aria-hidden="true"><Sparkles size={68} strokeWidth={1} /></div>
-      <div className="relative z-10 max-w-xl">
-        <p className="mb-4 flex items-center gap-2 text-xs font-bold tracking-[.18em] text-gold"><Sparkles size={15} aria-hidden="true" /> HUMAN RESOURCES</p>
-        <h1 className="text-4xl font-black tracking-[-.055em] sm:text-6xl">Welcome, {data.name.split(' ')[0]}.</h1>
-        <p className="mt-4 max-w-sm text-base leading-relaxed text-white/85">Manage your people, track attendance and stay on top of payroll.</p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button className="button button-gold" onClick={onRecognise}>Send recognition</button>
-          <Link className="hero-link" href={href('people', 'employees')}>Open employee records <ArrowUpRight size={16} /></Link>
+    <section className="hero dashboard-hero studio-hero">
+      <div className="studio-intro">
+        <p className="studio-label"><Sparkles size={16} aria-hidden="true" /> People operations</p>
+        <h1>Welcome, {data.name.split(' ')[0]}.</h1>
+        <p className="studio-description">See where your team needs you, from new hires and leave requests to the next payroll review.</p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link className="button button-gold" href={href('people', 'employees')}>Employee records <ArrowUpRight size={16} aria-hidden="true" /></Link>
+          <button className="hero-link" onClick={onRecognise}>Send recognition</button>
         </div>
       </div>
-      <div className="hero-feature relative z-10 rounded-2xl border border-white/20 p-4 sm:max-w-xs">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-gold"><Gift size={17} aria-hidden="true" /> Rewards marketplace</div>
-        <p className="text-3xl font-black">{number.format(data.balance)} pts</p>
-        <p className="mt-1 text-sm text-white/80">Available to redeem or gift</p>
-        <div className="mt-4 flex gap-3 text-white/85" aria-hidden="true"><Plane size={17} /><ShoppingBag size={17} /><Headphones size={17} /></div>
+      <div className="studio-image">
+        {/* Locally compressed decorative photography; this project is statically exported. */}
+        <picture><source media="(max-width: 600px)" srcSet="/workspace/team-small.webp" /><img src="/workspace/team.webp" alt="" width={1024} height={680} fetchPriority="high" /></picture>
+        <Link href={href('rewards')} className="studio-balance">
+          <span className="studio-balance-icon"><Gift size={20} aria-hidden="true" /></span>
+          <span><span className="block text-xs text-white/80">Rewards balance</span><strong className="block text-lg">{number.format(data.balance)} pts</strong></span>
+          <ArrowUpRight className="ml-auto shrink-0" size={16} aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );
@@ -100,7 +102,7 @@ export function ModuleHero({ section, title, page, data }) {
   };
   const stat = stats[section];
   return (
-    <section data-section={section} className="hero module-hero flex flex-wrap items-end justify-between gap-6 rounded-[28px] p-6 text-white md:p-9">
+    <section data-section={section} className="hero module-hero studio-module flex flex-wrap items-end justify-between gap-6 rounded-[28px] p-6 text-white md:p-9">
       <div>
         <p className="mb-2 text-xs font-bold tracking-[.17em] text-gold">{navigation[section].title.toUpperCase()}</p>
         <h1 className="text-3xl font-black tracking-[-.045em] md:text-5xl">{title}</h1>

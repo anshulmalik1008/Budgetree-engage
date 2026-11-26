@@ -250,7 +250,7 @@ export default function Workspace({ section, page }) {
 
   const needsRecipient = ['Recognition', 'Spotlight', 'Gift'].includes(action?.kind);
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
+    <div className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
         <Link href="/" className="flex w-fit items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-gold text-xl font-black text-forest">B</span><span className="text-xl leading-none font-extrabold tracking-tight">budgetree<span className="mt-1 block text-[10px] tracking-[.24em] text-white/70">ENGAGE</span></span></Link>
@@ -261,13 +261,13 @@ export default function Workspace({ section, page }) {
         <div className="mt-auto hidden items-center gap-3 border-t border-white/15 pt-4 lg:flex"><Avatar name={data.name} /><div className="min-w-0"><p className="truncate text-sm font-semibold">{data.name}</p><p className="text-xs text-white/70">Demo workspace</p></div></div>
       </aside>
       <div className="min-w-0">
-        <header className="flex min-h-16 flex-wrap items-center justify-between gap-2 border-b border-line bg-white px-4 py-3 md:px-7">
-          <div className="flex items-center gap-2 text-sm text-muted">{current.title}<ChevronRight size={14} aria-hidden="true" /><span className="font-semibold text-ink">{title}</span></div>
+        <header className="workspace-bar flex min-h-16 flex-wrap items-center justify-between gap-2 border-b border-line bg-white px-4 py-3 md:px-7">
+          <div className="flex min-w-0 items-center gap-2 text-sm text-muted">{current.title}<ChevronRight size={14} aria-hidden="true" /><span className="font-semibold text-ink">{title}</span></div>
           <button className="button button-gold" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
         </header>
         <div className={'xl:grid xl:min-h-[calc(100dvh-64px)] xl:grid-cols-[206px_minmax(0,1fr)]'}>
           <aside className="border-b border-line section-rail px-3 py-2 xl:border-r xl:border-b-0 xl:px-4 xl:py-6"><h2 className="mb-3 hidden px-3 font-extrabold xl:block">{current.title}</h2><nav aria-label={current.title + ' pages'} className="flex gap-1 overflow-x-auto p-1 xl:grid">{current.pages.map(([id, name]) => <NavLink key={id} to={href(section, id)} active={id === page} current={id === page ? 'page' : undefined}>{name}</NavLink>)}</nav></aside>
-          <main id="main" className="mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
+          <main id="main" className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
             {page !== 'dashboard' && <ModuleHero section={section} title={title} page={page} data={data} />}
             {pageContent()}
             <RelatedPages section={section} page={page} />
