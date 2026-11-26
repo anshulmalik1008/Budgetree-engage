@@ -24,7 +24,7 @@ function Avatar({ name }) {
 
 function NavLink({ to, active, current, children, dark }) {
   const styles = dark
-    ? active ? 'bg-white/15 text-gold' : 'text-white/75 hover:bg-white/10 hover:text-white'
+    ? active ? 'bg-white/15 text-white' : 'text-white/75 hover:bg-white/10 hover:text-white'
     : active ? 'bg-mint text-forest' : 'text-muted hover:bg-canvas';
   return <Link href={to} aria-current={current} className={'flex min-h-11 shrink-0 items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold ' + (dark ? 'primary-item ' : 'section-item ') + styles}>{children}</Link>;
 }
@@ -253,7 +253,7 @@ export default function Workspace({ section, page }) {
     <div className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
-        <Link href="/" className="flex w-fit items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-gold text-xl font-black text-forest">B</span><span className="text-xl leading-none font-extrabold tracking-tight">budgetree<span className="mt-1 block text-[10px] tracking-[.24em] text-white/70">ENGAGE</span></span></Link>
+        <Link href="/" className="flex w-fit items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-accent text-xl font-black text-white">B</span><span className="text-xl leading-none font-extrabold tracking-tight">budgetree<span className="mt-1 block text-[10px] tracking-[.24em] text-white/70">ENGAGE</span></span></Link>
         <button type="button" className="button button-light self-start lg:hidden" aria-expanded={menuOpen} aria-controls="main-navigation" onClick={() => setMenuOpen(open => !open)}><Menu size={19} aria-hidden="true" /> {menuOpen ? 'Close menu' : 'Open menu'}</button><nav id="main-navigation" aria-label="Main navigation" className={(menuOpen ? 'grid' : 'hidden') + ' gap-1 p-1 lg:grid'}>{Object.entries(navigation).map(([id, item]) => {
           const Icon = icons[item.icon];
           return <NavLink key={id} to={href(id)} active={id === section} current={id === section ? 'true' : undefined} dark><Icon size={18} aria-hidden="true" />{item.title}</NavLink>;
@@ -286,7 +286,7 @@ export default function Workspace({ section, page }) {
               ))}
             </nav>
           </details>
-          <button className="button button-gold" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
+          <button className="button button-accent" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
         </header>
         <main id="main" className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
           {page !== 'dashboard' && <ModuleHero section={section} title={title} page={page} data={data} />}

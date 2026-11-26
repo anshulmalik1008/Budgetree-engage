@@ -39,11 +39,11 @@ export function DashboardHero({ data, onRecognise }) {
   return (
     <section className="hero dashboard-hero studio-hero">
       <div className="studio-intro">
-        <p className="studio-label"><Sparkles size={16} aria-hidden="true" /> People operations</p>
+        <p className="studio-label"><Sparkles size={16} aria-hidden="true" /> HR workspace</p>
         <h1>Welcome, {data.name.split(' ')[0]}.</h1>
-        <p className="studio-description">See where your team needs you, from new hires and leave requests to the next payroll review.</p>
+        <p className="studio-description">Review employee records, approve leave and track upcoming payroll from one dashboard.</p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link className="button button-gold" href={href('people', 'employees')}>Employee records <ArrowUpRight size={16} aria-hidden="true" /></Link>
+          <Link className="button button-accent" href={href('people', 'employees')}>Employee records <ArrowUpRight size={16} aria-hidden="true" /></Link>
           <button className="hero-link" onClick={onRecognise}>Send recognition</button>
         </div>
       </div>
@@ -63,10 +63,10 @@ export function DashboardHero({ data, onRecognise }) {
 export function WorkspaceShortcuts() {
   return (
     <section className="grid gap-3">
-      <h2 className="text-xl font-extrabold tracking-tight">Quick access</h2>
+      <h2 className="text-xl font-extrabold tracking-tight">Workspace shortcuts</h2>
       <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
         {shortcuts.map(([section, label, copy, Icon]) => (
-          <Link key={section} href={section === 'recognition' ? href(section, 'engagement') : href(section)} className="card group flex items-start gap-3 transition hover:-translate-y-0.5 hover:border-emerald-400">
+          <Link key={section} href={section === 'recognition' ? href(section, 'engagement') : href(section)} className="card group flex items-start gap-3 transition hover:-translate-y-0.5 hover:border-[#a1b3c9]">
             <span className="panel-icon"><Icon size={20} aria-hidden="true" /></span>
             <span className="grow"><strong className="block">{label}</strong><span className="mt-1 block text-sm leading-relaxed text-muted">{copy}</span></span>
             <ArrowUpRight size={16} className="shrink-0 text-muted group-hover:text-forest" aria-hidden="true" />
@@ -85,7 +85,7 @@ export function ActivitySnapshot({ posts }) {
       {kinds.map(kind => {
         const count = posts.filter(post => post.kind === kind).length;
         const percentage = posts.length ? count / posts.length * 100 : 0;
-        return <div key={kind}><div className="mb-1.5 flex justify-between gap-2 text-sm"><span>{kind}</span><strong>{number.format(count)}</strong></div><div aria-hidden="true" className="h-2 overflow-hidden rounded-full bg-mint"><div className="h-full rounded-full bg-violet-700" style={{ width: percentage + '%' }} /></div></div>;
+        return <div key={kind}><div className="mb-1.5 flex justify-between gap-2 text-sm"><span>{kind}</span><strong>{number.format(count)}</strong></div><div aria-hidden="true" className="h-2 overflow-hidden rounded-full bg-mint"><div className="h-full rounded-full bg-accent" style={{ width: percentage + '%' }} /></div></div>;
       })}
       <Link className="text-sm font-semibold underline underline-offset-4" href={href('recognition')}>View recognition</Link>
     </section>
@@ -104,7 +104,7 @@ export function ModuleHero({ section, title, page, data }) {
   return (
     <section data-section={section} className="hero module-hero studio-module flex flex-wrap items-end justify-between gap-6 rounded-[28px] p-6 text-white md:p-9">
       <div>
-        <p className="mb-2 text-xs font-bold tracking-[.17em] text-gold">{navigation[section].title.toUpperCase()}</p>
+        <p className="mb-2 text-xs font-bold tracking-[.17em] text-white">{navigation[section].title.toUpperCase()}</p>
         <h1 className="text-3xl font-black tracking-[-.045em] md:text-5xl">{title}</h1>
         <p className="mt-3 max-w-lg leading-relaxed text-white/85">{descriptions[page] || hrPages[page]?.description}</p>
       </div>
@@ -120,7 +120,7 @@ export function RelatedPages({ section, page }) {
     <section className="mt-3 grid gap-3 border-t border-line pt-5">
       <h2 className="text-xl font-extrabold tracking-tight">More in {navigation[section].title}</h2>
       <div className="grid gap-3 lg:grid-cols-2">
-        {siblings.map(([id, label]) => <Link key={id} className="card flex items-start gap-3 transition hover:border-emerald-400" href={href(section, id)}><span className="grow"><strong>{label}</strong><span className="mt-1 block text-sm leading-relaxed text-muted">{descriptions[id] || hrPages[id]?.description}</span></span><ArrowUpRight className="mt-1 shrink-0" size={15} aria-hidden="true" /></Link>)}
+        {siblings.map(([id, label]) => <Link key={id} className="card flex items-start gap-3 transition hover:border-[#a1b3c9]" href={href(section, id)}><span className="grow"><strong>{label}</strong><span className="mt-1 block text-sm leading-relaxed text-muted">{descriptions[id] || hrPages[id]?.description}</span></span><ArrowUpRight className="mt-1 shrink-0" size={15} aria-hidden="true" /></Link>)}
       </div>
     </section>
   );

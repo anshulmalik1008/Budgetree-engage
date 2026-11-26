@@ -40,7 +40,7 @@ export function SopLibrary({ progress, onToggle }) {
       return <details key={name} className="card pro-sop">
         <summary className="flex cursor-pointer items-center gap-3"><span className="panel-icon"><BookOpen size={20} aria-hidden="true" /></span><span className="grow"><strong className="block text-lg">{name}</strong><span className="text-sm text-muted">{owner}</span></span><span className="text-sm font-semibold">{completed.length}/{steps.length} done</span></summary>
         <progress className="mt-4 w-full" value={completed.length} max={steps.length} aria-label={name + ' completion'} />
-        <ol className="mt-3 space-y-2">{steps.map((step, index) => <li key={index}><label className="flex cursor-pointer items-start gap-3 rounded-xl bg-canvas p-3"><input type="checkbox" className="mt-1 size-4 accent-violet-700" checked={completed.includes(index)} onChange={() => onToggle(name, index)} /><span>{step}</span></label></li>)}</ol>
+        <ol className="mt-3 space-y-2">{steps.map((step, index) => <li key={index}><label className="flex cursor-pointer items-start gap-3 rounded-xl bg-canvas p-3"><input type="checkbox" className="mt-1 size-4 accent-accent" checked={completed.includes(index)} onChange={() => onToggle(name, index)} /><span>{step}</span></label></li>)}</ol>
       </details>;
     })}
     {!matched.length && <p role="status">No procedures match your search.</p>}
