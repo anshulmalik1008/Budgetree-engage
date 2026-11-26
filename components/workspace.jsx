@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, CalendarDays, ChevronRight, ClipboardList, Gift, LayoutGrid, Plus, Search, Settings, Sparkles, Users, Wallet, X, Menu } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronDown, ChevronRight, ClipboardList, Gift, LayoutGrid, Plus, Search, Settings, Sparkles, Users, Wallet, X, Menu } from 'lucide-react';
 import { catalog, guides, href, initialData, navigation, people } from '../lib/workspace';
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
@@ -262,17 +262,37 @@ export default function Workspace({ section, page }) {
       </aside>
       <div className="min-w-0">
         <header className="workspace-bar flex min-h-16 flex-wrap items-center justify-between gap-2 border-b border-line bg-white px-4 py-3 md:px-7">
-          <div className="flex min-w-0 items-center gap-2 text-sm text-muted">{current.title}<ChevronRight size={14} aria-hidden="true" /><span className="font-semibold text-ink">{title}</span></div>
+          <details
+            key={section + '/' + page}
+            className="section-picker"
+            onBlur={event => {
+              if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;
+            }}
+            onKeyDown={event => {
+              if (event.key !== 'Escape') return;
+              event.currentTarget.open = false;
+              event.currentTarget.querySelector('summary').focus();
+            }}
+          >
+            <summary className="section-picker-trigger">
+              <span className="hidden sm:inline">{current.title}</span>
+              <ChevronRight size={14} className="hidden shrink-0 sm:block" aria-hidden="true" />
+              <span className="font-semibold text-ink">{title}</span>
+              <ChevronDown size={16} className="section-picker-chevron shrink-0" aria-hidden="true" />
+            </summary>
+            <nav className="section-picker-panel" aria-label={current.title + ' pages'}>
+              {current.pages.map(([id, name]) => (
+                <NavLink key={id} to={href(section, id)} active={id === page} current={id === page ? 'page' : undefined}>{name}</NavLink>
+              ))}
+            </nav>
+          </details>
           <button className="button button-gold" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
         </header>
-        <div className={'xl:grid xl:min-h-[calc(100dvh-64px)] xl:grid-cols-[206px_minmax(0,1fr)]'}>
-          <aside className="border-b border-line section-rail px-3 py-2 xl:border-r xl:border-b-0 xl:px-4 xl:py-6"><h2 className="mb-3 hidden px-3 font-extrabold xl:block">{current.title}</h2><nav aria-label={current.title + ' pages'} className="flex gap-1 overflow-x-auto p-1 xl:grid">{current.pages.map(([id, name]) => <NavLink key={id} to={href(section, id)} active={id === page} current={id === page ? 'page' : undefined}>{name}</NavLink>)}</nav></aside>
-          <main id="main" className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
-            {page !== 'dashboard' && <ModuleHero section={section} title={title} page={page} data={data} />}
-            {pageContent()}
-            <RelatedPages section={section} page={page} />
-          </main>
-        </div>
+        <main id="main" className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
+          {page !== 'dashboard' && <ModuleHero section={section} title={title} page={page} data={data} />}
+          {pageContent()}
+          <RelatedPages section={section} page={page} />
+        </main>
       </div>
       <dialog ref={dialog} onClose={() => setAction(null)} aria-labelledby="dialog-title" className="m-auto w-[min(92vw,480px)] rounded-2xl border border-line bg-white p-5 text-ink">
         {action && <><div className="mb-4 flex items-center justify-between gap-2"><h2 id="dialog-title" className="text-xl font-bold">{action.item ? action.kind + ' · ' + action.item[0] : ({ Recognition: 'Send recognition', Comment: 'Add comment', Spotlight: 'Create spotlight' })[action.kind]}</h2><button aria-label="Close dialog" className="rounded-lg p-2 hover:bg-canvas" onClick={() => dialog.current.close()}><X size={20} /></button></div>
