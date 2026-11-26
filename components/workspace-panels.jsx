@@ -70,7 +70,7 @@ export function WorkspaceShortcuts() {
       <h2 className="text-xl font-extrabold tracking-tight">Workspace shortcuts</h2>
       <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
         {shortcuts.map(([section, label, copy, Icon]) => (
-          <Link key={section} href={section === 'recognition' ? href(section, 'engagement') : href(section)} className="card group flex items-start gap-3 transition hover:-translate-y-0.5 hover:border-[#a1b3c9]">
+          <Link key={section} href={section === 'recognition' ? href(section, 'engagement') : href(section)} data-shortcut={section} className="card dashboard-panel dashboard-shortcut group flex items-start gap-3">
             <span className="panel-icon"><Icon size={20} aria-hidden="true" /></span>
             <span className="grow"><strong className="block">{label}</strong><span className="mt-1 block text-sm leading-relaxed text-muted">{copy}</span></span>
             <ArrowUpRight size={16} className="shrink-0 text-muted group-hover:text-forest" aria-hidden="true" />
@@ -84,7 +84,7 @@ export function WorkspaceShortcuts() {
 export function ActivitySnapshot({ posts }) {
   const kinds = ['Recognition', 'Update', 'Spotlight'];
   return (
-    <section className="card space-y-4">
+    <section className="card dashboard-panel dashboard-panel-trend space-y-4">
       <h2 className="text-lg font-extrabold tracking-tight">Activity breakdown</h2>
       {kinds.map(kind => {
         const count = posts.filter(post => post.kind === kind).length;
@@ -148,7 +148,7 @@ export function RelatedPages({ section, page }) {
 
 export function UpcomingCelebrations() {
   return (
-    <section className="card">
+    <section className="card dashboard-panel dashboard-panel-events">
       <CalendarDays className="panel-icon mb-3 box-content" size={19} aria-hidden="true" />
       <h2 className="text-lg font-extrabold">Coming up</h2>
       <dl className="mt-2 divide-y divide-line text-sm">

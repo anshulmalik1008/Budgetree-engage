@@ -17,7 +17,7 @@ const demoSales = [
 
 export function RewardsActivity({ history, compact = false }) {
   const entries = compact ? [...history, ...demoRewards].slice(0, 4) : [...history, ...demoRewards];
-  return <section className="card min-w-0">
+  return <section className="card dashboard-panel dashboard-panel-rewards min-w-0">
     <div className="flex items-start gap-3">
       <span className="panel-icon"><Gift size={19} aria-hidden="true" /></span>
       <div className="grow"><h2 className="text-lg font-bold">Rewards activity</h2><p className="text-sm text-muted">Gift cards, products and redemption channels</p></div>
@@ -42,7 +42,7 @@ export function SalesActivity({ updates, compact = false, onComplete }) {
     ['Orders logged', rows.filter(row => row.type === 'Order').length],
     ['Follow-ups due', rows.filter(row => row.type === 'Follow-up' && row.status === 'Pending').length],
   ];
-  return <section className="card min-w-0">
+  return <section className="card dashboard-panel dashboard-panel-sales min-w-0">
     <div className="flex items-start gap-3">
       <span className="panel-icon"><MapPin size={19} aria-hidden="true" /></span>
       <div className="grow"><h2 className="text-lg font-bold">Sales Force Automation</h2><p className="text-sm text-muted">Sample field activity</p></div>
@@ -61,7 +61,7 @@ export function DashboardActivity({ data }) {
   return <section aria-label="Rewards and field activity" className="grid gap-4 xl:grid-cols-2">
     <RewardsActivity history={data.history} compact />
     <SalesActivity updates={data.salesUpdates} compact />
-    <Link href={href('resources', 'sop')} className="card flex items-center gap-3 xl:col-span-2">
+    <Link href={href('resources', 'sop')} className="card dashboard-panel dashboard-panel-sop flex items-center gap-3 xl:col-span-2">
       <span className="panel-icon"><BookOpen size={19} aria-hidden="true" /></span>
       <span className="grow"><strong className="block">SOP Library</strong><span className="block text-sm text-muted">{started} of {guides.sop.length} checklists started</span></span>
       <ArrowUpRight size={17} aria-hidden="true" />
