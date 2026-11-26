@@ -40,12 +40,12 @@ export function DashboardHero({ data, onRecognise }) {
     <section className="hero dashboard-hero relative isolate grid items-center gap-7 overflow-hidden md:grid-cols-[minmax(0,1fr)_minmax(180px,245px)] rounded-[28px] px-6 py-9 text-white sm:px-10 lg:py-14">
       <div className="hero-orbit" aria-hidden="true"><Sparkles size={68} strokeWidth={1} /></div>
       <div className="relative z-10 max-w-xl">
-        <p className="mb-4 flex items-center gap-2 text-xs font-bold tracking-[.18em] text-gold"><Sparkles size={15} aria-hidden="true" /> EMPLOYEE ENGAGEMENT</p>
+        <p className="mb-4 flex items-center gap-2 text-xs font-bold tracking-[.18em] text-gold"><Sparkles size={15} aria-hidden="true" /> HUMAN RESOURCES</p>
         <h1 className="text-4xl font-black tracking-[-.055em] sm:text-6xl">Welcome, {data.name.split(' ')[0]}.</h1>
-        <p className="mt-4 max-w-sm text-base leading-relaxed text-white/85">Celebrate great work, connect with your team and put your rewards to good use.</p>
+        <p className="mt-4 max-w-sm text-base leading-relaxed text-white/85">Manage your people, track attendance and stay on top of payroll.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <button className="button button-gold" onClick={onRecognise}>Send recognition</button>
-          <Link className="hero-link" href={href('rewards')}>Explore rewards <ArrowUpRight size={16} /></Link>
+          <Link className="hero-link" href={href('people', 'employees')}>Open employee records <ArrowUpRight size={16} /></Link>
         </div>
       </div>
       <div className="hero-feature relative z-10 rounded-2xl border border-white/20 p-4 sm:max-w-xs">

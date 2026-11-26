@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, CalendarDays, ChevronRight, ClipboardList, Gift, LayoutGrid, Plus, Search, Settings, Sparkles, Users, Wallet, X, Trophy, Zap } from 'lucide-react';
+import { BookOpen, CalendarDays, ChevronRight, ClipboardList, Gift, LayoutGrid, Plus, Search, Settings, Sparkles, Users, Wallet, X, Menu } from 'lucide-react';
 import { catalog, guides, href, initialData, navigation, people } from '../lib/workspace';
 
+import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
 import { HrPage } from './hr-page';
 import { ActivitySnapshot, DashboardHero, ModuleHero, RelatedPages, UpcomingCelebrations, WorkspaceShortcuts } from './workspace-panels';
 
@@ -29,6 +30,7 @@ function NavLink({ to, active, current, children, dark }) {
 }
 
 export default function Workspace({ section, page }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [data, setData] = useState(initialData);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
@@ -49,7 +51,7 @@ export default function Workspace({ section, page }) {
         const referencePosts = initialData.posts.filter(post =>
           ['townhall-overachiever', 'frontend-platform'].includes(post.id) && !posts.some(existing => existing.id === post.id),
         );
-        setData({ ...initialData, ...previous, posts: [...posts, ...referencePosts] });
+        setData({ ...initialData, ...previous, name: /^Natasha(?: Sharma)?$/i.test(previous.name ?? '') ? initialData.name : previous.name ?? initialData.name, posts: [...posts, ...referencePosts] });
       }
     } catch {
       setNotice('Browser storage could not be loaded.');
@@ -80,12 +82,12 @@ export default function Workspace({ section, page }) {
   }
 
   function editPost(id, change, message) {
-    save(previous => ({ ...previous, posts: previous.posts.map(post => post.id === id ? change(post) : post) }), message);
+    save(previous => ({ ...previous, name: /^Natasha(?: Sharma)?$/i.test(previous.name ?? '') ? initialData.name : previous.name ?? initialData.name, posts: previous.posts.map(post => post.id === id ? change(post) : post) }), message);
   }
 
   function publish(body, kind, recipient) {
     const post = { id: crypto.randomUUID(), author: data.name, recipient, kind, body, likes: 0, comments: [] };
-    save(previous => ({ ...previous, posts: [post, ...previous.posts] }), kind + ' posted.');
+    save(previous => ({ ...previous, name: /^Natasha(?: Sharma)?$/i.test(previous.name ?? '') ? initialData.name : previous.name ?? initialData.name, posts: [post, ...previous.posts] }), kind + ' posted.');
   }
 
   function submitDialog(event) {
@@ -151,14 +153,7 @@ export default function Workspace({ section, page }) {
       case 'feed':
         return <>
           {page === 'dashboard' && <DashboardHero data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
-          {page === 'dashboard' && <div className="grid gap-3 sm:grid-cols-3">
-            {[[Wallet, 'Available rewards', points(data.balance)], [Trophy, 'Recognition posts', data.posts.filter(post => post.kind === 'Recognition').length], [Zap, 'Groups joined', data.groups.length]].map(([Icon, label, value]) =>
-              <section className="card metric-tile flex items-center gap-3" key={label}>
-                <span className="panel-icon"><Icon size={21} aria-hidden="true" /></span>
-                <div><p className="text-sm font-semibold text-muted">{label}</p><p className="text-2xl font-extrabold tracking-tight">{value}</p></div>
-              </section>,
-            )}
-          </div>}
+          {page === 'dashboard' && <Operations data={data} />}
           {page === 'dashboard' && <WorkspaceShortcuts />}
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_270px]">
             <div className="grid gap-4">
@@ -225,7 +220,14 @@ export default function Workspace({ section, page }) {
       case 'engagement':
       case 'lifecycle':
         return survey();
+      case 'copilot':
+        return <WorkspaceCopilot />;
       case 'sop':
+        return <SopLibrary progress={data.sopProgress ?? {}} onToggle={(name, index) => save(previous => {
+          const checked = previous.sopProgress?.[name] ?? [];
+          const next = checked.includes(index) ? checked.filter(value => value !== index) : [...checked, index];
+          return { ...previous, sopProgress: { ...previous.sopProgress, [name]: next } };
+        }, 'Checklist updated.')} />;
       case 'policies':
       case 'help': {
         const matches = guides[page].filter(guide => guide.join(' ').toLowerCase().includes(query.trim().toLowerCase()));
@@ -252,7 +254,7 @@ export default function Workspace({ section, page }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
         <Link href="/" className="flex w-fit items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-gold text-xl font-black text-forest">B</span><span className="text-xl leading-none font-extrabold tracking-tight">budgetree<span className="mt-1 block text-[10px] tracking-[.24em] text-white/70">ENGAGE</span></span></Link>
-        <nav aria-label="Main navigation" className="flex gap-1 overflow-x-auto p-1 lg:grid">{Object.entries(navigation).map(([id, item]) => {
+        <button type="button" className="button button-light self-start lg:hidden" aria-expanded={menuOpen} aria-controls="main-navigation" onClick={() => setMenuOpen(open => !open)}><Menu size={19} aria-hidden="true" /> {menuOpen ? 'Close menu' : 'Open menu'}</button><nav id="main-navigation" aria-label="Main navigation" className={(menuOpen ? 'grid' : 'hidden') + ' gap-1 p-1 lg:grid'}>{Object.entries(navigation).map(([id, item]) => {
           const Icon = icons[item.icon];
           return <NavLink key={id} to={href(id)} active={id === section} current={id === section ? 'true' : undefined} dark><Icon size={18} aria-hidden="true" />{item.title}</NavLink>;
         })}</nav>

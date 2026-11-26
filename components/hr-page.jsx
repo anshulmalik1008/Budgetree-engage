@@ -1,31 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { hrPages } from '../lib/hr-pages';
-import { href } from '../lib/workspace';
-
-const guideTopics = [
-  ['Onboarding', 'Find the joining checklist and task owners.', href('people', 'onboarding')],
-  ['Leave', 'Review the status of leave requests.', href('attendance', 'leave')],
-  ['Payslips', 'Find sample payslip records by period.', href('payroll', 'payslips')],
-  ['SOP', 'Search the library for step-by-step procedures.', href('resources', 'sop')],
-  ['Recognition', 'Send a colleague a message of appreciation.', href('recognition', 'recognise')],
-];
-
-function WorkspaceGuide() {
-  const [topic, setTopic] = useState(null);
-  return <section className="card grid gap-4">
-    <h2 className="text-xl font-extrabold">Workspace guide</h2>
-    <p className="text-muted">Choose a topic for quick guidance. This demo uses preset answers.</p>
-    <div className="flex flex-wrap gap-2">{guideTopics.map(item => <button key={item[0]} type="button" className="button button-light" aria-pressed={topic === item} onClick={() => setTopic(item)}>{item[0]}</button>)}</div>
-    {topic && <div className="rounded-xl bg-canvas p-4"><p>{topic[1]}</p><Link className="mt-2 inline-block font-semibold underline" href={topic[2]}>Open {topic[0]}</Link></div>}
-  </section>;
-}
 
 export function HrPage({ page, data, save }) {
   const [query, setQuery] = useState('');
-  if (page === 'copilot') return <WorkspaceGuide />;
   const definition = hrPages[page];
   if (!definition) return null;
   const rows = data.hrRecords?.[page] ?? definition.rows;

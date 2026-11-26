@@ -72,3 +72,15 @@ body { background-image: radial-gradient(ellipse at 100% 0, #eee6ff, transparent
 .reward-art { background: radial-gradient(circle at 75% 15%,#fff0ca,transparent 55%),linear-gradient(135deg,#e5d9fd,#d3c0ff); }
 .reward-art[data-category="Travel"] { background: linear-gradient(135deg,#cee8fc,#d9e1ff); }
 .reward-art[data-category="Lifestyle"] { background: linear-gradient(135deg,#fae1f0,#eed5ff); }
+
+body { font-family:'Poppins',system-ui,sans-serif; font-size:16px; line-height:1.65; }
+.primary-rail { background:linear-gradient(155deg,#14132d,#26204f 65%,#1d1731); }
+.dashboard-hero { min-height:340px;background:radial-gradient(ellipse at 93% 7%,#9d4bb3,transparent 56%),linear-gradient(125deg,#161934,#392375 70%,#673ba2); }
+.dashboard-hero h1 { font-size:clamp(2.1rem,5vw,4.25rem);line-height:1.12; }
+.module-hero h1 { font-size:clamp(1.9rem,4vw,3.35rem);line-height:1.17; }
+.pro-metric { transition:transform .18s ease,border-color .18s ease; }
+.pro-metric:hover { transform:translateY(-3px); border-color:#9c78e8; }
+.pro-metric:nth-child(4) { background:linear-gradient(145deg,#fff,#fbe3fa); }
+.pro-sop[open] { border-color:#b297ef; }
+.pro-sop progress { accent-color:#6941c6; }
+@media (prefers-reduced-motion:reduce) { .pro-metric { transition:none; } }
