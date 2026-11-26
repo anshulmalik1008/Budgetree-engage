@@ -12,7 +12,7 @@ import { DashboardSettings, dashboardThemes } from './dashboard-settings';
 import { DashboardCharts } from './dashboard-charts';
 import { hrPages } from '../lib/hr-pages';
 import { EngagementTools } from './engagement-tools';
-import { employeeRecords } from '../lib/employee-records';
+import { employeeNameLookup, employeeRecords } from '../lib/employee-records';
 import { CelebrationRecords, EmployeePhoto, EmployeeRecords } from './employee-records';
 import { HrPage } from './hr-page';
 import { ActivitySnapshot, DashboardHero, ModuleHero, RelatedPages, UpcomingCelebrations, WorkspaceShortcuts } from './workspace-panels';
@@ -121,6 +121,8 @@ export default function Workspace({ section, page }) {
       if (data.balance < cost) { setNotice('You need ' + points(cost - data.balance) + ' more.'); return; }
       const entry = {
         id: crypto.randomUUID(), name, cost, recipient, actor: data.name,
+        actorId: employeeIdForName(data.name),
+        recipientId: employeeIdForName(recipient),
         status: recipient ? 'Gift sent' : 'Redeemed',
         channel: recipient ? null : 'Rewards Shop · Demo',
       };
@@ -135,14 +137,14 @@ export default function Workspace({ section, page }) {
     return posts.length ? posts.map(post => (
       <Card key={post.id}>
         <div className="flex items-start gap-3">
-          <Avatar name={post.author} />
-          <div className="grow"><p className="font-semibold">{post.author}</p><p className="text-sm text-muted">{post.recipient ? 'Celebrated ' + post.recipient : 'Team activity'}</p></div>
+          <Avatar name={displayName(post.author)} />
+          <div className="grow"><p className="font-semibold">{displayName(post.author)}</p><p className="text-sm text-muted">{post.recipient ? 'Celebrated ' + displayName(post.recipient) : 'Team activity'}</p></div>
           <span className="rounded-lg bg-mint px-2 py-1 text-xs font-semibold">{post.kind}</span>
         </div>
         {post.title && <h3 className="mt-4 text-xl font-extrabold tracking-tight">{post.title}</h3>}
         <p className="my-3 break-words leading-relaxed">{post.body}</p>
         {post.highlight && <div className="mb-4 rounded-xl bg-mint px-4 py-3 text-sm font-semibold">{post.highlight}</div>}
-        {post.comments.map((comment, index) => <p key={index} className="mb-2 break-words rounded-lg bg-canvas px-3 py-2 text-sm"><strong>{comment.author}</strong> {comment.body}</p>)}
+        {post.comments.map((comment, index) => <p key={index} className="mb-2 break-words rounded-lg bg-canvas px-3 py-2 text-sm"><strong>{displayName(comment.author)}</strong> {comment.body}</p>)}
         <div className="flex flex-wrap gap-2">
           <button className="button button-light" aria-pressed={!!post.liked} onClick={() => editPost(post.id, item => ({ ...item, liked: !item.liked, likes: item.likes + (item.liked ? -1 : 1) }), post.liked ? 'Applause removed.' : 'Applause added.')}>Applaud · {post.likes}</button>
           <button className="button button-light" onClick={() => setAction({ kind: 'Comment', id: post.id })}>Comment</button>
@@ -165,7 +167,12 @@ export default function Workspace({ section, page }) {
     )}</Card>;
   }
 
+  const displayName = employeeNameLookup(data);
   const employees = employeeRecords(data).filter(employee => !employee.archived && employee.status !== 'Exited');
+  function employeeIdForName(name) {
+    const matches = employees.filter(employee => employee.name === name);
+    return matches.length === 1 ? matches[0].id : undefined;
+  }
   const recipients = [...new Set([...employees.map(employee => employee.name), ...(action?.recipient ? [action.recipient] : [])])];
 
   function pageContent() {
@@ -176,7 +183,7 @@ export default function Workspace({ section, page }) {
           {page === 'dashboard' && <DashboardHero company={company} data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
           {page === 'dashboard' && visibility.metrics !== false && <Operations data={data} />}
           {page === 'dashboard' && visibility.charts !== false && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
-          {page === 'dashboard' && visibility.activity !== false && <DashboardActivity data={data} />}
+          {page === 'dashboard' && visibility.activity !== false && <DashboardActivity data={data} displayName={displayName} />}
           {page === 'dashboard' && visibility.shortcuts !== false && <WorkspaceShortcuts />}
           {(page === 'feed' || visibility.feed !== false) && <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_270px]">
             <div className="grid gap-4">
@@ -193,7 +200,7 @@ export default function Workspace({ section, page }) {
             </div>
             <div className="grid content-start gap-4">
               <ActivitySnapshot posts={data.posts} />
-              <UpcomingCelebrations entries={data.celebrations} />
+              <UpcomingCelebrations entries={data.celebrations} displayName={displayName} />
             </div>
           </div>}
         </>;
@@ -219,7 +226,7 @@ export default function Workspace({ section, page }) {
       case 'spotlight':
         return <><div><button className="button" onClick={() => setAction({ kind: 'Spotlight' })}>Create spotlight</button></div>{postList(data.posts.filter(post => post.kind === 'Spotlight'))}</>;
       case 'leaderboard':
-        return <Card><ol className="divide-y divide-line">{recipients.map(name => [name, data.posts.filter(post => post.kind === 'Recognition' && post.recipient === name).length]).sort((a, b) => b[1] - a[1]).map(([name, score], index) => <li key={name} className="flex items-center gap-3 py-3"><span className="w-5 text-sm text-muted">{index + 1}</span><Avatar name={name} /><strong className="grow">{name}</strong><span className="text-sm">{score} received</span></li>)}</ol></Card>;
+        return <Card><ol className="divide-y divide-line">{recipients.map(name => [name, data.posts.filter(post => post.kind === 'Recognition' && displayName(post.recipient) === name).length]).sort((a, b) => b[1] - a[1]).map(([name, score], index) => <li key={name} className="flex items-center gap-3 py-3"><span className="w-5 text-sm text-muted">{index + 1}</span><Avatar name={name} /><strong className="grow">{name}</strong><span className="text-sm">{score} received</span></li>)}</ol></Card>;
       case 'events':
       case 'polls':
       case 'ideas':
@@ -249,9 +256,9 @@ export default function Workspace({ section, page }) {
         </>;
       }
       case 'history':
-        return <RewardsActivity history={data.history} />;
+        return <RewardsActivity history={data.history} displayName={displayName} />;
       case 'sfa':
-        return <SalesActivity updates={data.salesUpdates} onComplete={id => save(previous => ({
+        return <SalesActivity updates={data.salesUpdates} displayName={displayName} onComplete={id => save(previous => ({
           ...previous, salesUpdates: { ...previous.salesUpdates, [id]: 'Completed' },
         }), 'Sales activity updated.')} />;
       case 'engagement':

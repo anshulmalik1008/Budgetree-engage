@@ -25,7 +25,16 @@ export function EmployeeRecords({ page, data, save, ready }) {
   });
 
   function update(id, patch, message) {
-    save(previous => ({ ...previous, employees: employeeRecords(previous).map(record => record.id === id ? { ...record, ...patch } : record) }), message);
+    save(previous => ({
+      ...previous,
+      employees: employeeRecords(previous).map(record => {
+        if (record.id !== id) return record;
+        const previousNames = patch.name && patch.name !== record.name
+          ? [...new Set([...(record.previousNames ?? []), record.name])]
+          : record.previousNames;
+        return { ...record, ...patch, previousNames };
+      }),
+    }), message);
   }
 
   async function submit(event) {
