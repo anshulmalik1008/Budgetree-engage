@@ -92,6 +92,16 @@ export function ActivitySnapshot({ posts }) {
   );
 }
 
+const sectionPhotos = {
+  overview: 'team',
+  people: 'employees',
+  attendance: 'attendance',
+  payroll: 'payroll',
+  recognition: 'recognition',
+  rewards: 'rewards',
+  resources: 'resources',
+};
+
 export function ModuleHero({ section, title, page, data }) {
   const stats = {
     people: [data.groups.length, 'Groups joined'],
@@ -103,12 +113,18 @@ export function ModuleHero({ section, title, page, data }) {
   const stat = stats[section];
   return (
     <section data-section={section} className="hero module-hero studio-module flex flex-wrap items-end justify-between gap-6 rounded-[28px] p-6 text-white md:p-9">
+      <img
+        className="section-header-image"
+        src={'/workspace/' + (page === 'sop' ? 'library' : sectionPhotos[section]) + '.webp'}
+        alt=""
+        decoding="async"
+      />
       <div>
         <p className="mb-2 text-xs font-bold tracking-[.17em] text-white">{navigation[section].title.toUpperCase()}</p>
         <h1 className="text-3xl font-black tracking-[-.045em] md:text-5xl">{title}</h1>
         <p className="mt-3 max-w-lg leading-relaxed text-white/85">{descriptions[page] || hrPages[page]?.description}</p>
       </div>
-      {stat && <div className="rounded-2xl border border-white/30 bg-white/10 px-5 py-3"><strong className="block text-2xl">{number.format(stat[0])}</strong><span className="text-sm text-white/85">{stat[1]}</span></div>}
+      {stat && <div className="section-header-stat rounded-2xl border border-white/30 bg-white/10 px-5 py-3"><strong className="block text-2xl">{number.format(stat[0])}</strong><span className="text-sm text-white/85">{stat[1]}</span></div>}
     </section>
   );
 }
