@@ -6,6 +6,7 @@ import { BookOpen, CalendarDays, ChevronDown, ChevronRight, ClipboardList, Gift,
 import { catalog, guides, href, initialData, navigation, people } from '../lib/workspace';
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
+import { EngagementTools } from './engagement-tools';
 import { HrPage } from './hr-page';
 import { ActivitySnapshot, DashboardHero, ModuleHero, RelatedPages, UpcomingCelebrations, WorkspaceShortcuts } from './workspace-panels';
 
@@ -193,17 +194,23 @@ export default function Workspace({ section, page }) {
         return <><div><button className="button" onClick={() => setAction({ kind: 'Spotlight' })}>Create spotlight</button></div>{postList(data.posts.filter(post => post.kind === 'Spotlight'))}</>;
       case 'leaderboard':
         return <Card><ol className="divide-y divide-line">{people.map(([name]) => [name, data.posts.filter(post => post.kind === 'Recognition' && post.recipient === name).length]).sort((a, b) => b[1] - a[1]).map(([name, score], index) => <li key={name} className="flex items-center gap-3 py-3"><span className="w-5 text-sm text-muted">{index + 1}</span><Avatar name={name} /><strong className="grow">{name}</strong><span className="text-sm">{score} received</span></li>)}</ol></Card>;
+      case 'events':
+      case 'polls':
+      case 'ideas':
+        return <EngagementTools page={page} data={data} save={save} />;
       case 'marketplace':
       case 'send-gift': {
-        const items = catalog.filter(item => rewardCategory === 'All' || item[3] === rewardCategory);
+        const items = catalog.filter(([name, , , category, description]) => (rewardCategory === 'All' || category === rewardCategory) && (name + ' ' + description).toLowerCase().includes(query.trim().toLowerCase()));
         return <>
           <div className="card flex flex-wrap items-end justify-between gap-3">
             <div><h2 className="text-xl font-extrabold">Rewards catalog</h2><p className="mt-1 text-sm text-muted">{items.length} rewards available to browse</p></div>
+            <label className="field">Find a reward<input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by name" /></label>
             <label className="field">Category<select value={rewardCategory} onChange={event => setRewardCategory(event.target.value)}>{['All', 'Dining', 'Travel', 'Lifestyle'].map(category => <option key={category}>{category}</option>)}</select></label>
           </div>
+          {!items.length && <p role="status" className="card text-muted">No rewards match this search.</p>}
           <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">{items.map(item => (
             <Card key={item[0]}>
-              <div aria-hidden="true" className="reward-art mb-4 grid h-36 place-items-center rounded-xl text-5xl" data-category={item[3]}>{item[2]}</div>
+              <div className="reward-art mb-4 aspect-[16/10] overflow-hidden rounded-xl"><img className="h-full w-full object-cover" src={'/rewards/' + item[2] + '.webp'} alt="" width={400} height={400} loading="lazy" decoding="async" /></div>
               <p className="text-xs font-semibold tracking-wide text-muted uppercase">{item[3]}</p>
               <h2 className="mt-1 text-lg font-extrabold">{item[0]}</h2>
               <p className="mt-1 min-h-10 text-sm leading-relaxed text-muted">{item[4]}</p>

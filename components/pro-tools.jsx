@@ -53,6 +53,10 @@ export function WorkspaceCopilot() {
   const topics = [
     ...operations.map(([section, page, label]) => [label, hrPages[page].description, href(section, page)]),
     ['Onboarding', hrPages.onboarding.description, href('people', 'onboarding')],
+    ['Team events', 'See what is coming up and RSVP from the Team Events page.', href('recognition', 'events')],
+    ['Quick polls', 'Vote for an activity and review your selected option.', href('recognition', 'polls')],
+    ['Idea board', 'Save workplace improvement suggestions.', href('recognition', 'ideas')],
+    ['Rewards shop', 'Browse rewards by name or category, then redeem with demo points.', href('rewards', 'marketplace')],
     ['Payslips', hrPages.payslips.description, href('payroll', 'payslips')],
     ...guides.sop.map(([label, , description]) => [label, Array.isArray(description) ? description.join(' ') : description, href('resources', 'sop')]),
   ];
@@ -64,7 +68,7 @@ export function WorkspaceCopilot() {
       <label className="field min-w-0 grow">Your question<input value={query} onChange={event => setQuery(event.target.value)} required placeholder="Where do I approve leave?" /></label>
       <button className="button"><Search size={17} aria-hidden="true" /> Search</button>
     </form>
-    <div className="flex flex-wrap gap-2">{['Onboarding', 'Leave approvals', 'Payslips', 'Payroll'].map(label => <button className="button button-light" key={label} type="button" onClick={() => { setQuery(label); setSubmitted(label); }}>{label}</button>)}</div>
+    <div className="flex flex-wrap gap-2">{['Onboarding', 'Leave approvals', 'Payslips', 'Rewards shop', 'Team events'].map(label => <button className="button button-light" key={label} type="button" onClick={() => { setQuery(label); setSubmitted(label); }}>{label}</button>)}</div>
     <div aria-live="polite">{submitted && <div className="grid gap-3">{matches.length ? matches.map(({ topic: [label, answer, url] }) => <article key={label} className="rounded-xl bg-canvas p-4"><h3 className="font-bold">{label}</h3><p className="my-2">{answer}</p><Link href={url} className="font-semibold underline">Open related page</Link></article>) : <p>No matches. Try a topic such as leave, attendance or onboarding.</p>}</div>}</div>
   </section>;
 }
