@@ -7,6 +7,7 @@ import { hrPages } from '../lib/hr-pages';
 const number = new Intl.NumberFormat('en-IN');
 
 const descriptions = {
+  sfa: 'Track field visits, orders and sales follow-ups.',
   events: 'Browse upcoming team events and manage your RSVP.',
   polls: 'Vote on what the team should do next.',
   ideas: 'Capture suggestions for improving the employee experience.',

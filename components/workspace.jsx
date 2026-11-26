@@ -6,6 +6,7 @@ import { BookOpen, CalendarDays, ChevronDown, ChevronRight, ClipboardList, Gift,
 import { catalog, guides, href, initialData, navigation, people } from '../lib/workspace';
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
+import { DashboardActivity, RewardsActivity, SalesActivity } from './dashboard-activity';
 import { DashboardCharts } from './dashboard-charts';
 import { hrPages } from '../lib/hr-pages';
 import { EngagementTools } from './engagement-tools';
@@ -107,7 +108,11 @@ export default function Workspace({ section, page }) {
     } else if (action.kind === 'Redeem' || action.kind === 'Gift') {
       const [name, cost] = action.item;
       if (data.balance < cost) { setNotice('You need ' + points(cost - data.balance) + ' more.'); return; }
-      const entry = { id: crypto.randomUUID(), name, cost, recipient };
+      const entry = {
+        id: crypto.randomUUID(), name, cost, recipient, actor: data.name,
+        status: recipient ? 'Gift sent' : 'Redeemed',
+        channel: recipient ? null : 'Rewards Shop · Demo',
+      };
       save(previous => previous.balance < cost ? previous : { ...previous, balance: previous.balance - cost, history: [entry, ...previous.history] }, 'Demo transaction recorded.');
     } else {
       publish(body, action.kind, recipient);
@@ -157,6 +162,7 @@ export default function Workspace({ section, page }) {
           {page === 'dashboard' && <DashboardHero data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
           {page === 'dashboard' && <Operations data={data} />}
           {page === 'dashboard' && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
+          {page === 'dashboard' && <DashboardActivity data={data} />}
           {page === 'dashboard' && <WorkspaceShortcuts />}
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_270px]">
             <div className="grid gap-4">
@@ -225,7 +231,11 @@ export default function Workspace({ section, page }) {
         </>;
       }
       case 'history':
-        return <Card>{data.history.length ? <ul className="divide-y divide-line">{data.history.map(entry => <li key={entry.id} className="flex justify-between gap-3 py-3"><div><strong>{entry.name}</strong><p className="text-sm text-muted">{entry.recipient ? 'Gift to ' + entry.recipient : 'Personal redemption'}</p></div><span>{points(entry.cost)}</span></li>)}</ul> : <p className="text-muted">No reward transactions yet.</p>}</Card>;
+        return <RewardsActivity history={data.history} />;
+      case 'sfa':
+        return <SalesActivity updates={data.salesUpdates} onComplete={id => save(previous => ({
+          ...previous, salesUpdates: { ...previous.salesUpdates, [id]: 'Completed' },
+        }), 'Sales activity updated.')} />;
       case 'engagement':
       case 'lifecycle':
         return survey();
