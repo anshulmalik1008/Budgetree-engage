@@ -7,6 +7,7 @@ import { catalog, guides, href, initialData, navigation, people } from '../lib/w
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
 import { DashboardActivity, RewardsActivity, SalesActivity } from './dashboard-activity';
+import { DashboardSettings, dashboardThemes } from './dashboard-settings';
 import { DashboardCharts } from './dashboard-charts';
 import { hrPages } from '../lib/hr-pages';
 import { EngagementTools } from './engagement-tools';
@@ -35,6 +36,8 @@ function NavLink({ to, active, current, children, dark }) {
 
 export default function Workspace({ section, page }) {
   const [data, setData] = useState(initialData);
+  const theme = dashboardThemes.some(option => option.id === data.dashboardTheme) ? data.dashboardTheme : 'vivid';
+  const visibility = data.dashboardWidgets ?? {};
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
   const [query, setQuery] = useState('');
@@ -160,11 +163,11 @@ export default function Workspace({ section, page }) {
       case 'feed':
         return <>
           {page === 'dashboard' && <DashboardHero data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
-          {page === 'dashboard' && <Operations data={data} />}
-          {page === 'dashboard' && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
-          {page === 'dashboard' && <DashboardActivity data={data} />}
-          {page === 'dashboard' && <WorkspaceShortcuts />}
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_270px]">
+          {page === 'dashboard' && visibility.metrics !== false && <Operations data={data} />}
+          {page === 'dashboard' && visibility.charts !== false && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
+          {page === 'dashboard' && visibility.activity !== false && <DashboardActivity data={data} />}
+          {page === 'dashboard' && visibility.shortcuts !== false && <WorkspaceShortcuts />}
+          {(page === 'feed' || visibility.feed !== false) && <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_270px]">
             <div className="grid gap-4">
               <Card><form className="grid gap-3" onSubmit={event => {
                 event.preventDefault();
@@ -181,7 +184,7 @@ export default function Workspace({ section, page }) {
               <ActivitySnapshot posts={data.posts} />
               <UpcomingCelebrations />
             </div>
-          </div>
+          </div>}
         </>;
       case 'directory': {
         const matches = people.filter(person => person.join(' ').toLowerCase().includes(query.trim().toLowerCase()));
@@ -255,12 +258,16 @@ export default function Workspace({ section, page }) {
       case 'budgets':
       case 'settings': {
         const budget = page === 'budgets';
-        return <Card><h2 className="text-xl font-bold">{budget ? 'Points allocation' : 'Profile settings'}</h2><p className="mb-4 mt-1 text-sm text-muted">{budget ? 'Set the monthly demo rewards budget.' : 'Update the name displayed in your workspace. Changes are saved on this browser.'}</p><form key={budget ? data.budget : data.name} className="grid max-w-md gap-4" onSubmit={event => {
+        return <>{!budget && <DashboardSettings theme={theme} visibility={visibility} ready={ready}
+          onTheme={value => save(previous => ({ ...previous, dashboardTheme: value }), 'Dashboard theme saved.')}
+          onWidget={(id, show) => save(previous => ({ ...previous, dashboardWidgets: { ...previous.dashboardWidgets, [id]: show } }), 'Dashboard sections updated.')}
+          onReset={() => save(previous => ({ ...previous, dashboardTheme: 'vivid', dashboardWidgets: {} }), 'Dashboard preferences reset.')}
+        />}<Card><h2 className="text-xl font-bold">{budget ? 'Points allocation' : 'Profile settings'}</h2><p className="mb-4 mt-1 text-sm text-muted">{budget ? 'Set the monthly demo rewards budget.' : 'Update the name displayed in your workspace. Changes are saved on this browser.'}</p><form key={budget ? data.budget : data.name} className="grid max-w-md gap-4" onSubmit={event => {
           event.preventDefault();
           const value = String(new FormData(event.currentTarget).get('value')).trim();
           if (!value) { setNotice('Enter a value before saving.'); return; }
           save(previous => budget ? { ...previous, budget: Number(value) } : { ...previous, name: value }, budget ? 'Budget saved.' : 'Profile saved.');
-        }}><label className="field">{budget ? 'Monthly points allocation' : 'Display name'}{budget ? <input name="value" type="number" min="0" max="1000000" step="1" defaultValue={data.budget} required /> : <input name="value" maxLength={60} defaultValue={data.name} required />}</label><div><button className="button">Save changes</button></div></form></Card>;
+        }}><label className="field">{budget ? 'Monthly points allocation' : 'Display name'}{budget ? <input name="value" type="number" min="0" max="1000000" step="1" defaultValue={data.budget} required /> : <input name="value" maxLength={60} defaultValue={data.name} required />}</label><div><button className="button">Save changes</button></div></form></Card></>;
       }
       default:
         return <HrPage key={page} page={page} data={data} save={save} />;
@@ -273,7 +280,7 @@ export default function Workspace({ section, page }) {
   });
   const needsRecipient = ['Recognition', 'Spotlight', 'Gift'].includes(action?.kind);
   return (
-    <div className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
+    <div data-dashboard-theme={theme} className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
         <Link href="/" className="flex w-fit max-w-full items-center rounded-xl bg-white p-2" aria-label="Budgetree home">
@@ -323,7 +330,10 @@ export default function Workspace({ section, page }) {
               ))}
             </nav>
           </details>
-          <button className="button button-accent" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href={href('resources', 'settings')} className="button button-light" aria-current={page === 'settings' ? 'page' : undefined}><Settings size={17} aria-hidden="true" />Settings</Link>
+            <button className="button button-accent" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
+          </div>
         </header>
         <main id="main" className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
           {page !== 'dashboard' && <ModuleHero section={section} title={title} page={page} data={data} />}
