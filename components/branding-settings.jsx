@@ -6,7 +6,7 @@ import { Building2, Upload } from 'lucide-react';
 export const defaultLogo = '/workspace/budgetree-logo.png';
 export const defaultCompany = 'Budgetree';
 
-async function prepareLogo(file) {
+export async function prepareWorkspaceImage(file) {
   if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
     throw new Error('Choose a PNG, JPEG or WebP image.');
   }
@@ -22,7 +22,7 @@ async function prepareLogo(file) {
     canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
     canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
     const logo = canvas.toDataURL('image/webp', 0.9);
-    if (!logo.startsWith('data:image/') || logo.length > 400000) throw new Error('Choose a smaller logo image.');
+    if (!logo.startsWith('data:image/') || logo.length > 400000) throw new Error('Choose a smaller image.');
     return logo;
   } finally {
     URL.revokeObjectURL(url);
@@ -43,7 +43,7 @@ export function BrandingSettings({ company, logo, ready, onSave, onReset }) {
     setError('');
     setSaving(true);
     try {
-      const nextLogo = file?.size ? await prepareLogo(file) : logo;
+      const nextLogo = file?.size ? await prepareWorkspaceImage(file) : logo;
       onSave(name, nextLogo);
       form.elements.logo.value = '';
     } catch (failure) {

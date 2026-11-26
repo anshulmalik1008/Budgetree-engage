@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { CalendarDays, Lightbulb, ListChecks } from 'lucide-react';
 
 const events = [
@@ -10,21 +11,50 @@ const events = [
 
 const choices = ['Skills workshop', 'Volunteer day', 'Team sports', 'Creative activity'];
 
-export function EngagementTools({ page, data, save }) {
+export function EngagementTools({ page, data, save, ready }) {
+  const [eventDraft, setEventDraft] = useState(null);
+  const teamEvents = data.teamEvents ?? events;
   if (page === 'events') {
-    return <div className="grid gap-4 md:grid-cols-2">{events.map(event => {
+    return <>
+      <div><button className="button button-accent" disabled={!ready} onClick={() => setEventDraft({})}>Add event</button></div>
+      {eventDraft && <form key={eventDraft.id ?? 'new'} className="card grid gap-3 sm:grid-cols-2" onSubmit={event => {
+        event.preventDefault();
+        const form = new FormData(event.currentTarget);
+        const name = String(form.get('name')).trim();
+        const schedule = String(form.get('schedule')).trim();
+        const details = String(form.get('details')).trim();
+        if (!name || !schedule || !details) return;
+        const row = { id: eventDraft.id ?? crypto.randomUUID(), name, schedule, details };
+        save(previous => {
+          const current = previous.teamEvents ?? events;
+          return { ...previous, teamEvents: eventDraft.id ? current.map(entry => entry.id === row.id ? row : entry) : [...current, row] };
+        }, 'Event saved.');
+        setEventDraft(null);
+      }}>
+        <label className="field">Event name<input name="name" required maxLength={100} defaultValue={eventDraft.name} /></label>
+        <label className="field">Date, time and time zone<input name="schedule" required maxLength={100} defaultValue={eventDraft.schedule} placeholder="3 Dec 2026 · 3:00 PM IST" /></label>
+        <label className="field sm:col-span-2">Details<textarea name="details" required maxLength={500} defaultValue={eventDraft.details} /></label>
+        <div className="flex gap-2"><button className="button">Save event</button><button type="button" className="button button-light" onClick={() => setEventDraft(null)}>Cancel</button></div>
+      </form>}
+      <div className="grid gap-4 md:grid-cols-2">{teamEvents.map(event => {
       const attending = data.eventRsvps?.includes(event.id);
       return <article key={event.id} className="card">
         <span className="panel-icon"><CalendarDays size={20} aria-hidden="true" /></span>
         <p className="mt-4 text-sm font-semibold text-accent">{event.schedule}</p>
         <h2 className="mt-1 text-xl font-bold">{event.name}</h2>
         <p className="mb-5 mt-2 text-sm text-muted">{event.details}</p>
-        <button type="button" className={'button ' + (attending ? 'button-light' : 'button-accent')} aria-pressed={!!attending} onClick={() => save(previous => {
+        <div className="flex flex-wrap gap-2"><button type="button" disabled={!ready} className={'button ' + (attending ? 'button-light' : 'button-accent')} aria-pressed={!!attending} onClick={() => save(previous => {
           const rsvps = previous.eventRsvps ?? [];
           return { ...previous, eventRsvps: rsvps.includes(event.id) ? rsvps.filter(id => id !== event.id) : [...rsvps, event.id] };
         }, attending ? 'RSVP cancelled.' : 'RSVP saved.')}>{attending ? 'Cancel RSVP' : 'RSVP'}</button>
+        <button className="button button-light" disabled={!ready} onClick={() => setEventDraft(event)}>Edit</button>
+        <button className="button button-light" disabled={!ready} onClick={() => {
+          if (!window.confirm('Remove this event?')) return;
+          save(previous => ({ ...previous, teamEvents: (previous.teamEvents ?? events).filter(row => row.id !== event.id), eventRsvps: (previous.eventRsvps ?? []).filter(id => id !== event.id) }), 'Event removed.');
+          if (eventDraft?.id === event.id) setEventDraft(null);
+        }}>Remove</button></div>
       </article>;
-    })}</div>;
+    })}</div>{!teamEvents.length && <p className="card text-muted">No events added.</p>}</>;
   }
   if (page === 'polls') {
     return <section className="card">

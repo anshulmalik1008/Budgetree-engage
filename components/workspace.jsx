@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, CalendarDays, ChevronDown, ChevronRight, ClipboardList, Gift, LayoutGrid, Plus, Search, Settings, Sparkles, Users, Wallet, X, Menu } from 'lucide-react';
-import { catalog, guides, href, initialData, navigation, people } from '../lib/workspace';
+import { catalog, guides, href, initialData, navigation } from '../lib/workspace';
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
 import { DashboardActivity, RewardsActivity, SalesActivity } from './dashboard-activity';
@@ -12,6 +12,8 @@ import { DashboardSettings, dashboardThemes } from './dashboard-settings';
 import { DashboardCharts } from './dashboard-charts';
 import { hrPages } from '../lib/hr-pages';
 import { EngagementTools } from './engagement-tools';
+import { employeeRecords } from '../lib/employee-records';
+import { CelebrationRecords, EmployeePhoto, EmployeeRecords } from './employee-records';
 import { HrPage } from './hr-page';
 import { ActivitySnapshot, DashboardHero, ModuleHero, RelatedPages, UpcomingCelebrations, WorkspaceShortcuts } from './workspace-panels';
 
@@ -163,6 +165,9 @@ export default function Workspace({ section, page }) {
     )}</Card>;
   }
 
+  const employees = employeeRecords(data).filter(employee => !employee.archived && employee.status !== 'Exited');
+  const recipients = [...new Set([...employees.map(employee => employee.name), ...(action?.recipient ? [action.recipient] : [])])];
+
   function pageContent() {
     switch (page) {
       case 'dashboard':
@@ -188,13 +193,17 @@ export default function Workspace({ section, page }) {
             </div>
             <div className="grid content-start gap-4">
               <ActivitySnapshot posts={data.posts} />
-              <UpcomingCelebrations />
+              <UpcomingCelebrations entries={data.celebrations} />
             </div>
           </div>}
         </>;
+      case 'employees':
+      case 'onboarding':
+      case 'offboarding':
+        return <><EmployeeRecords key={page} page={page} data={data} save={save} ready={ready} />{page !== 'employees' && <HrPage key={page + '-tasks'} page={page} data={data} save={save} ready={ready} />}</>;
       case 'directory': {
-        const matches = people.filter(person => person.join(' ').toLowerCase().includes(query.trim().toLowerCase()));
-        return <><label className="field max-w-md">Search by name or team<input type="search" value={query} onChange={event => setQuery(event.target.value)} /></label><div className="grid gap-4 sm:grid-cols-2">{matches.map(([name, team]) => <Card key={name}><div className="mb-4 flex items-center gap-3"><Avatar name={name} /><div><h2 className="font-bold">{name}</h2><p className="text-sm text-muted">{team}</p></div></div><button className="button button-light" onClick={() => setAction({ kind: 'Recognition', recipient: name })}>Recognise</button></Card>)}</div>{!matches.length && <p className="text-muted">No colleagues match your search.</p>}</>;
+        const matches = employees.filter(employee => [employee.name, employee.department, employee.role].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
+        return <><label className="field max-w-md">Search by name or team<input type="search" value={query} onChange={event => setQuery(event.target.value)} /></label><div className="grid gap-4 sm:grid-cols-2">{matches.map(employee => <Card key={employee.id}><div className="mb-4 flex items-center gap-3"><EmployeePhoto employee={employee} /><div><h2 className="break-words font-bold">{employee.name}</h2><p className="text-sm text-muted">{employee.department}</p></div></div><button className="button button-light" onClick={() => setAction({ kind: 'Recognition', recipient: employee.name })}>Recognise</button></Card>)}</div>{!matches.length && <p className="text-muted">No colleagues match your search.</p>}</>;
       }
       case 'groups':
         return <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{[['Townhall', 'Company announcements'], ['Engineering', 'Product and platform updates'], ['Culture Club', 'Team activities and events']].map(([group, description]) => {
@@ -202,7 +211,7 @@ export default function Workspace({ section, page }) {
           return <Card key={group}><h2 className="font-bold">{group}</h2><p className="my-2 text-sm text-muted">{description}</p><button className="button button-light" onClick={() => save(previous => ({ ...previous, groups: joined ? previous.groups.filter(item => item !== group) : [...previous.groups, group] }), joined ? 'Group left.' : 'Group joined.')}>{joined ? 'Leave group' : 'Join group'}</button></Card>;
         })}</div>;
       case 'celebrations':
-        return <div className="grid gap-4 sm:grid-cols-2">{[['Sara Scott', 'Work anniversary · 27 November'], ['Liam Patel', 'Birthday · 2 December']].map(([name, occasion]) => <Card key={name}><h2 className="font-bold">{name}</h2><p className="my-2 text-muted">{occasion}</p><button className="button button-light" onClick={() => setAction({ kind: 'Recognition', recipient: name })}>Send wishes</button></Card>)}</div>;
+        return <CelebrationRecords data={data} save={save} ready={ready} onRecognise={name => setAction({ kind: 'Recognition', recipient: name })} />;
       case 'recognise':
         return <><div><button className="button" onClick={() => setAction({ kind: 'Recognition' })}>Send recognition</button></div>{postList(data.posts.filter(post => post.kind === 'Recognition'))}</>;
       case 'wall-of-fame':
@@ -210,11 +219,11 @@ export default function Workspace({ section, page }) {
       case 'spotlight':
         return <><div><button className="button" onClick={() => setAction({ kind: 'Spotlight' })}>Create spotlight</button></div>{postList(data.posts.filter(post => post.kind === 'Spotlight'))}</>;
       case 'leaderboard':
-        return <Card><ol className="divide-y divide-line">{people.map(([name]) => [name, data.posts.filter(post => post.kind === 'Recognition' && post.recipient === name).length]).sort((a, b) => b[1] - a[1]).map(([name, score], index) => <li key={name} className="flex items-center gap-3 py-3"><span className="w-5 text-sm text-muted">{index + 1}</span><Avatar name={name} /><strong className="grow">{name}</strong><span className="text-sm">{score} received</span></li>)}</ol></Card>;
+        return <Card><ol className="divide-y divide-line">{recipients.map(name => [name, data.posts.filter(post => post.kind === 'Recognition' && post.recipient === name).length]).sort((a, b) => b[1] - a[1]).map(([name, score], index) => <li key={name} className="flex items-center gap-3 py-3"><span className="w-5 text-sm text-muted">{index + 1}</span><Avatar name={name} /><strong className="grow">{name}</strong><span className="text-sm">{score} received</span></li>)}</ol></Card>;
       case 'events':
       case 'polls':
       case 'ideas':
-        return <EngagementTools page={page} data={data} save={save} />;
+        return <EngagementTools page={page} data={data} save={save} ready={ready} />;
       case 'marketplace':
       case 'send-gift': {
         const items = catalog.filter(([name, , , category, description]) => (rewardCategory === 'All' || category === rewardCategory) && (name + ' ' + description).toLowerCase().includes(query.trim().toLowerCase()));
@@ -281,7 +290,7 @@ export default function Workspace({ section, page }) {
         }}><label className="field">{budget ? 'Monthly points allocation' : 'Display name'}{budget ? <input name="value" type="number" min="0" max="1000000" step="1" defaultValue={data.budget} required /> : <input name="value" maxLength={60} defaultValue={data.name} required />}</label><div><button className="button">Save changes</button></div></form></Card></>;
       }
       default:
-        return <HrPage key={page} page={page} data={data} save={save} />;
+        return <HrPage key={page + '-tasks'} page={page} data={data} save={save} ready={ready} />;
     }
   }
 
@@ -356,7 +365,7 @@ export default function Workspace({ section, page }) {
         {action && <><div className="mb-4 flex items-center justify-between gap-2"><h2 id="dialog-title" className="text-xl font-bold">{action.item ? action.kind + ' · ' + action.item[0] : ({ Recognition: 'Send recognition', Comment: 'Add comment', Spotlight: 'Create spotlight' })[action.kind]}</h2><button aria-label="Close dialog" className="rounded-lg p-2 hover:bg-canvas" onClick={() => dialog.current.close()}><X size={20} /></button></div>
           <form className="grid gap-4" onSubmit={submitDialog}>
             {action.item && <p>Cost · {points(action.item[1])}</p>}
-            {needsRecipient && <label className="field">Recipient<select name="recipient" required defaultValue={action.recipient || ''}><option value="">Choose a colleague</option>{people.map(([name]) => <option key={name}>{name}</option>)}</select></label>}
+            {needsRecipient && <label className="field">Recipient<select name="recipient" required defaultValue={action.recipient || ''}><option value="">Choose a colleague</option>{recipients.map(name => <option key={name}>{name}</option>)}</select></label>}
             {!action.item && <label className="field">Message<textarea name="body" rows={4} maxLength={500} required /></label>}
             <div><button className="button" disabled={!ready}>Confirm</button></div>
             <p role="status" className="text-sm text-muted">{notice}</p>

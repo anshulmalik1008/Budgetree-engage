@@ -1,3 +1,4 @@
+import { sampleCelebrations } from '../lib/employee-records';
 import Link from 'next/link';
 import { ArrowUpRight, BookOpen, CalendarDays, ClipboardList, Gift, Sparkles, Users } from 'lucide-react';
 import { href, navigation } from '../lib/workspace';
@@ -146,14 +147,15 @@ export function RelatedPages({ section, page }) {
   );
 }
 
-export function UpcomingCelebrations() {
+export function UpcomingCelebrations({ entries = sampleCelebrations }) {
+  const upcoming = [...entries].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3);
   return (
     <section className="card dashboard-panel dashboard-panel-events">
       <CalendarDays className="panel-icon mb-3 box-content" size={19} aria-hidden="true" />
       <h2 className="text-lg font-extrabold">Coming up</h2>
       <dl className="mt-2 divide-y divide-line text-sm">
-        <div className="py-2"><dt className="font-semibold">27 Nov · Sara Scott</dt><dd className="text-muted">Work anniversary</dd></div>
-        <div className="py-2"><dt className="font-semibold">2 Dec · Liam Patel</dt><dd className="text-muted">Birthday</dd></div>
+        {upcoming.map(entry => <div className="py-2" key={entry.id}><dt className="font-semibold">{entry.name}</dt><dd className="text-muted">{entry.occasion} · {entry.date}</dd></div>)}
+        {!upcoming.length && <div className="py-2"><dt className="text-muted">No celebrations added.</dt></div>}
       </dl>
       <Link className="mt-2 inline-flex items-center gap-1 text-sm font-semibold" href={href('recognition', 'celebrations')}>View celebrations <ArrowUpRight size={15} /></Link>
     </section>

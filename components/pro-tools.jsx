@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight, BookOpen, CalendarDays, ClipboardCheck, Search, Sparkles, Users, Wallet } from 'lucide-react';
 import { guides, href } from '../lib/workspace';
+import { employeeRecords } from '../lib/employee-records';
 import { hrPages } from '../lib/hr-pages';
 
 const operations = [
@@ -17,7 +18,7 @@ export function Operations({ data }) {
   const metrics = [
     ...operations.map(([section, page, label, status, Icon]) => {
       const records = data.hrRecords?.[page] ?? hrPages[page].rows;
-      return [section, page, label, status, Icon, records.filter(row => row[2] === status).length];
+      return [section, page, label, status, Icon, page === 'employees' ? employeeRecords(data).filter(record => !record.archived && record.status === 'Active').length : records.filter(row => row[2] === status).length];
     }),
     ['people', 'onboarding', 'Onboarding', 'Pending tasks', ClipboardCheck, (data.hrRecords?.onboarding ?? hrPages.onboarding.rows).filter(row => row[2] === 'Pending').length],
     ['recognition', 'wall-of-fame', 'Recognition', 'Posts', Sparkles, data.posts.filter(post => post.kind === 'Recognition').length],
