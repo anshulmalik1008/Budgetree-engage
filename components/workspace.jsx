@@ -276,7 +276,9 @@ export default function Workspace({ section, page }) {
     <div className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
-        <Link href="/" className="flex w-fit items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-accent text-xl font-black text-white">B</span><span className="text-xl leading-none font-extrabold tracking-tight">budgetree<span className="mt-1 block text-[10px] tracking-[.24em] text-white/70">ENGAGE</span></span></Link>
+        <Link href="/" className="flex w-fit max-w-full items-center rounded-xl bg-white p-2" aria-label="Budgetree home">
+          <img src="/workspace/budgetree-logo.png" alt="Budgetree" width={266} height={68} className="h-auto w-36 max-w-full lg:w-40" />
+        </Link>
         <details key={page} className="mobile-main-menu lg:hidden">
           <summary className="button button-light">
             <Menu size={19} aria-hidden="true" /><span className="mobile-menu-open-label">Open menu</span><span className="mobile-menu-close-label">Close menu</span>
