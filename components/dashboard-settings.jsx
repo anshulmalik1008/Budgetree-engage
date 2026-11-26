@@ -14,7 +14,7 @@ const widgets = [
   ['feed', 'Team feed and celebrations', Newspaper],
 ];
 
-export function DashboardSettings({ theme, visibility, ready, onTheme, onWidget, onReset }) {
+export function DashboardSettings({ theme, visibility, ready, compact, narrow, onTheme, onWidget, onLayout, onReset }) {
   return <section className="card grid gap-6">
     <div className="flex items-center gap-3"><span className="panel-icon"><Palette size={21} aria-hidden="true" /></span><div><h2 className="text-xl font-bold">Dashboard appearance</h2><p className="text-sm text-muted">Your theme and section choices are saved on this browser.</p></div></div>
     <fieldset disabled={!ready} className="min-w-0">
@@ -36,6 +36,11 @@ export function DashboardSettings({ theme, visibility, ready, onTheme, onWidget,
           <input type="checkbox" className="size-4 shrink-0 accent-accent" checked={visibility[id] !== false} onChange={event => onWidget(id, event.target.checked)} />
         </label>
       ))}</div>
+    </fieldset>
+    <fieldset disabled={!ready} className="grid gap-2 sm:grid-cols-2">
+      <legend className="mb-2 font-semibold">Layout preferences</legend>
+      <label className="theme-option"><span className="grow text-sm font-semibold">Compact dashboard</span><input className="size-4 accent-accent" type="checkbox" checked={compact} onChange={event => onLayout('dashboardDensity', event.target.checked ? 'compact' : 'comfortable')} /></label>
+      <label className="theme-option"><span className="grow text-sm font-semibold">Narrow desktop sidebar</span><input className="size-4 accent-accent" type="checkbox" checked={narrow} onChange={event => onLayout('sidebarSize', event.target.checked ? 'narrow' : 'standard')} /></label>
     </fieldset>
     <div><button type="button" className="button button-light" disabled={!ready} onClick={onReset}>Reset dashboard preferences</button></div>
   </section>;

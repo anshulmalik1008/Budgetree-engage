@@ -7,6 +7,7 @@ import { catalog, guides, href, initialData, navigation, people } from '../lib/w
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
 import { DashboardActivity, RewardsActivity, SalesActivity } from './dashboard-activity';
+import { BrandingSettings, defaultCompany, defaultLogo } from './branding-settings';
 import { DashboardSettings, dashboardThemes } from './dashboard-settings';
 import { DashboardCharts } from './dashboard-charts';
 import { hrPages } from '../lib/hr-pages';
@@ -38,6 +39,11 @@ export default function Workspace({ section, page }) {
   const [data, setData] = useState(initialData);
   const theme = dashboardThemes.some(option => option.id === data.dashboardTheme) ? data.dashboardTheme : 'vivid';
   const visibility = data.dashboardWidgets ?? {};
+  const company = data.companyName || defaultCompany;
+  const logo = data.companyLogo || '';
+  const customBranding = Boolean(logo || company !== defaultCompany);
+  const compact = data.dashboardDensity === 'compact';
+  const narrow = data.sidebarSize === 'narrow';
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
   const [query, setQuery] = useState('');
@@ -162,7 +168,7 @@ export default function Workspace({ section, page }) {
       case 'dashboard':
       case 'feed':
         return <>
-          {page === 'dashboard' && <DashboardHero data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
+          {page === 'dashboard' && <DashboardHero company={company} data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
           {page === 'dashboard' && visibility.metrics !== false && <Operations data={data} />}
           {page === 'dashboard' && visibility.charts !== false && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
           {page === 'dashboard' && visibility.activity !== false && <DashboardActivity data={data} />}
@@ -258,11 +264,16 @@ export default function Workspace({ section, page }) {
       case 'budgets':
       case 'settings': {
         const budget = page === 'budgets';
-        return <>{!budget && <DashboardSettings theme={theme} visibility={visibility} ready={ready}
+        return <>{!budget && <>
+          <BrandingSettings company={company} logo={logo} ready={ready}
+            onSave={(name, image) => save(previous => ({ ...previous, companyName: name, companyLogo: image }), 'Company branding saved.')}
+            onReset={() => save(previous => ({ ...previous, companyName: defaultCompany, companyLogo: '' }), 'Budgetree branding restored.')}
+          />
+          <DashboardSettings compact={compact} narrow={narrow} onLayout={(key, value) => save(previous => ({ ...previous, [key]: value }), 'Layout preference saved.')} theme={theme} visibility={visibility} ready={ready}
           onTheme={value => save(previous => ({ ...previous, dashboardTheme: value }), 'Dashboard theme saved.')}
           onWidget={(id, show) => save(previous => ({ ...previous, dashboardWidgets: { ...previous.dashboardWidgets, [id]: show } }), 'Dashboard sections updated.')}
-          onReset={() => save(previous => ({ ...previous, dashboardTheme: 'vivid', dashboardWidgets: {} }), 'Dashboard preferences reset.')}
-        />}<Card><h2 className="text-xl font-bold">{budget ? 'Points allocation' : 'Profile settings'}</h2><p className="mb-4 mt-1 text-sm text-muted">{budget ? 'Set the monthly demo rewards budget.' : 'Update the name displayed in your workspace. Changes are saved on this browser.'}</p><form key={budget ? data.budget : data.name} className="grid max-w-md gap-4" onSubmit={event => {
+          onReset={() => save(previous => ({ ...previous, dashboardTheme: 'vivid', dashboardWidgets: {}, dashboardDensity: 'comfortable', sidebarSize: 'standard' }), 'Dashboard preferences reset.')}
+        /></>}<Card><h2 className="text-xl font-bold">{budget ? 'Points allocation' : 'Profile settings'}</h2><p className="mb-4 mt-1 text-sm text-muted">{budget ? 'Set the monthly demo rewards budget.' : 'Update the name displayed in your workspace. Changes are saved on this browser.'}</p><form key={budget ? data.budget : data.name} className="grid max-w-md gap-4" onSubmit={event => {
           event.preventDefault();
           const value = String(new FormData(event.currentTarget).get('value')).trim();
           if (!value) { setNotice('Enter a value before saving.'); return; }
@@ -280,11 +291,11 @@ export default function Workspace({ section, page }) {
   });
   const needsRecipient = ['Recognition', 'Spotlight', 'Gift'].includes(action?.kind);
   return (
-    <div data-dashboard-theme={theme} className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
+    <div data-dashboard-theme={theme} data-dashboard-density={compact ? 'compact' : 'comfortable'} data-sidebar-size={narrow ? 'narrow' : 'standard'} className="workspace-shell min-h-screen lg:grid">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
-        <Link href="/" className="flex w-fit max-w-full items-center rounded-xl bg-white p-2" aria-label="Budgetree home">
-          <img src="/workspace/budgetree-logo.png" alt="Budgetree" width={266} height={68} className="h-auto w-36 max-w-full lg:w-40" />
+        <Link href="/" className="workspace-wordmark" aria-label={company + ' dashboard'}>
+          {logo || !customBranding ? <img src={logo || defaultLogo} alt={company} /> : <strong>{company}</strong>}
         </Link>
         <details key={page} className="mobile-main-menu lg:hidden">
           <summary className="button button-light">
@@ -295,7 +306,7 @@ export default function Workspace({ section, page }) {
           </nav>
         </details>
         <nav aria-label="Main navigation" className="hidden gap-1 p-1 lg:grid">{mainLinks}</nav>
-        <div className="mt-auto hidden items-center gap-3 border-t border-white/15 pt-4 lg:flex"><Avatar name={data.name} /><div className="min-w-0"><p className="truncate text-sm font-semibold">{data.name}</p><p className="text-xs text-white/70">Demo workspace</p></div></div>
+        <div className="mt-auto hidden items-center gap-3 border-t border-white/15 pt-4 lg:flex"><Avatar name={data.name} /><div className="min-w-0"><p className="truncate text-sm font-semibold">{data.name}</p><p className="text-xs text-white/70">{company} workspace</p></div></div>
       </aside>
       <div className="min-w-0">
         <header className="workspace-bar flex min-h-16 flex-wrap items-center justify-between gap-2 border-b border-line bg-white px-4 py-3 md:px-7">
@@ -335,7 +346,7 @@ export default function Workspace({ section, page }) {
             <button className="button button-accent" onClick={() => setAction({ kind: 'Recognition' })}><Plus size={17} aria-hidden="true" />Send recognition</button>
           </div>
         </header>
-        <main id="main" className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
+        <main id="main" data-dashboard={page === 'dashboard' ? 'true' : undefined} className="studio-content mx-auto grid w-full max-w-[1500px] min-w-0 content-start gap-6 p-4 md:p-8 xl:p-10" tabIndex={-1}>
           {page !== 'dashboard' && <ModuleHero section={section} title={title} page={page} data={data} />}
           {pageContent()}
           <RelatedPages section={section} page={page} />
