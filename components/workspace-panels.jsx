@@ -42,7 +42,7 @@ export function DashboardHero({ data, onRecognise }) {
   return (
     <section className="hero dashboard-hero studio-hero">
       <div className="studio-intro">
-        <p className="studio-label"><Sparkles size={16} aria-hidden="true" /> HR workspace</p>
+        <p className="studio-label"><Sparkles size={16} aria-hidden="true" /> HR Dashboard</p>
         <h1>Welcome, {data.name.split(' ')[0]}.</h1>
         <p className="studio-description">Review employee records, approve leave and track upcoming payroll from one dashboard.</p>
         <div className="mt-7 flex flex-wrap gap-3">

@@ -6,6 +6,8 @@ import { BookOpen, CalendarDays, ChevronDown, ChevronRight, ClipboardList, Gift,
 import { catalog, guides, href, initialData, navigation, people } from '../lib/workspace';
 
 import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
+import { DashboardCharts } from './dashboard-charts';
+import { hrPages } from '../lib/hr-pages';
 import { EngagementTools } from './engagement-tools';
 import { HrPage } from './hr-page';
 import { ActivitySnapshot, DashboardHero, ModuleHero, RelatedPages, UpcomingCelebrations, WorkspaceShortcuts } from './workspace-panels';
@@ -31,7 +33,6 @@ function NavLink({ to, active, current, children, dark }) {
 }
 
 export default function Workspace({ section, page }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [data, setData] = useState(initialData);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState('');
@@ -155,6 +156,7 @@ export default function Workspace({ section, page }) {
         return <>
           {page === 'dashboard' && <DashboardHero data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
           {page === 'dashboard' && <Operations data={data} />}
+          {page === 'dashboard' && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
           {page === 'dashboard' && <WorkspaceShortcuts />}
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_270px]">
             <div className="grid gap-4">
@@ -243,7 +245,7 @@ export default function Workspace({ section, page }) {
       case 'budgets':
       case 'settings': {
         const budget = page === 'budgets';
-        return <Card><form key={budget ? data.budget : data.name} className="grid max-w-md gap-4" onSubmit={event => {
+        return <Card><h2 className="text-xl font-bold">{budget ? 'Points allocation' : 'Profile settings'}</h2><p className="mb-4 mt-1 text-sm text-muted">{budget ? 'Set the monthly demo rewards budget.' : 'Update the name displayed in your workspace. Changes are saved on this browser.'}</p><form key={budget ? data.budget : data.name} className="grid max-w-md gap-4" onSubmit={event => {
           event.preventDefault();
           const value = String(new FormData(event.currentTarget).get('value')).trim();
           if (!value) { setNotice('Enter a value before saving.'); return; }
@@ -255,16 +257,25 @@ export default function Workspace({ section, page }) {
     }
   }
 
+  const mainLinks = Object.entries(navigation).map(([id, item]) => {
+    const Icon = icons[item.icon];
+    return <NavLink key={id} to={href(id)} active={id === section} current={id === section ? 'true' : undefined} dark><Icon size={18} aria-hidden="true" />{item.title}</NavLink>;
+  });
   const needsRecipient = ['Recognition', 'Spotlight', 'Gift'].includes(action?.kind);
   return (
     <div className="workspace-shell min-h-screen lg:grid lg:grid-cols-[236px_minmax(0,1fr)]">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:rounded-lg focus:bg-white focus:p-3">Skip to content</a>
       <aside className="flex flex-col gap-4 primary-rail p-4 text-white lg:sticky lg:top-0 lg:h-dvh lg:gap-9 lg:p-5">
         <Link href="/" className="flex w-fit items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-accent text-xl font-black text-white">B</span><span className="text-xl leading-none font-extrabold tracking-tight">budgetree<span className="mt-1 block text-[10px] tracking-[.24em] text-white/70">ENGAGE</span></span></Link>
-        <button type="button" className="button button-light self-start lg:hidden" aria-expanded={menuOpen} aria-controls="main-navigation" onClick={() => setMenuOpen(open => !open)}><Menu size={19} aria-hidden="true" /> {menuOpen ? 'Close menu' : 'Open menu'}</button><nav id="main-navigation" aria-label="Main navigation" className={(menuOpen ? 'grid' : 'hidden') + ' gap-1 p-1 lg:grid'}>{Object.entries(navigation).map(([id, item]) => {
-          const Icon = icons[item.icon];
-          return <NavLink key={id} to={href(id)} active={id === section} current={id === section ? 'true' : undefined} dark><Icon size={18} aria-hidden="true" />{item.title}</NavLink>;
-        })}</nav>
+        <details key={page} className="mobile-main-menu lg:hidden">
+          <summary className="button button-light">
+            <Menu size={19} aria-hidden="true" /><span className="mobile-menu-open-label">Open menu</span><span className="mobile-menu-close-label">Close menu</span>
+          </summary>
+          <nav aria-label="Mobile navigation" className="mt-2 grid gap-1">
+            {mainLinks}
+          </nav>
+        </details>
+        <nav aria-label="Main navigation" className="hidden gap-1 p-1 lg:grid">{mainLinks}</nav>
         <div className="mt-auto hidden items-center gap-3 border-t border-white/15 pt-4 lg:flex"><Avatar name={data.name} /><div className="min-w-0"><p className="truncate text-sm font-semibold">{data.name}</p><p className="text-xs text-white/70">Demo workspace</p></div></div>
       </aside>
       <div className="min-w-0">

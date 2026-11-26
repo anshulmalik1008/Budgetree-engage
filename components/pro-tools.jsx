@@ -14,12 +14,21 @@ const operations = [
 ];
 
 export function Operations({ data }) {
-  return <section aria-label="HR operations" className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
-    {operations.map(([section, page, label, status, Icon]) => {
+  const metrics = [
+    ...operations.map(([section, page, label, status, Icon]) => {
       const records = data.hrRecords?.[page] ?? hrPages[page].rows;
+      return [section, page, label, status, Icon, records.filter(row => row[2] === status).length];
+    }),
+    ['people', 'onboarding', 'Onboarding', 'Pending tasks', ClipboardCheck, (data.hrRecords?.onboarding ?? hrPages.onboarding.rows).filter(row => row[2] === 'Pending').length],
+    ['recognition', 'wall-of-fame', 'Recognition', 'Posts', Sparkles, data.posts.filter(post => post.kind === 'Recognition').length],
+    ['recognition', 'events', 'Event RSVPs', 'Saved', CalendarDays, data.eventRsvps?.length ?? 0],
+    ['rewards', 'marketplace', 'Rewards', 'Available points', Wallet, data.balance.toLocaleString('en-IN')],
+  ];
+  return <section aria-label="HR operations" className="dashboard-metrics">
+    {metrics.map(([section, page, label, status, Icon, value]) => {
       return <Link href={href(section, page)} key={page} className="card metric-tile pro-metric">
-        <span className="flex items-center justify-between"><span className="panel-icon"><Icon size={22} aria-hidden="true" /></span><ArrowUpRight size={18} aria-hidden="true" /></span>
-        <strong className="mt-4 block text-4xl">{records.filter(row => row[2] === status).length}</strong>
+        <span className="flex items-center justify-between"><span className="panel-icon"><Icon size={17} aria-hidden="true" /></span><ArrowUpRight size={15} aria-hidden="true" /></span>
+        <strong className="mt-2 block text-2xl">{value}</strong>
         <span className="mt-1 block font-semibold">{label}</span><span className="text-sm text-muted">{status}</span>
       </Link>;
     })}
