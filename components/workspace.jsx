@@ -295,6 +295,13 @@ export default function Workspace({ section, page }) {
           <details
             key={section + '/' + page}
             className="section-picker"
+            onPointerEnter={event => {
+              if (event.pointerType === 'mouse') event.currentTarget.open = true;
+            }}
+            onPointerLeave={event => {
+              const picker = event.currentTarget;
+              if (event.pointerType === 'mouse' && !picker.contains(document.activeElement)) picker.open = false;
+            }}
             onBlur={event => {
               if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;
             }}
