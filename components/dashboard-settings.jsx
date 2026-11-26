@@ -8,6 +8,7 @@ export const dashboardThemes = [
 
 const widgets = [
   ['metrics', 'HR metrics', Grid2X2],
+  ['actions', 'Action center', Zap],
   ['charts', 'Attendance charts', BarChart3],
   ['activity', 'Rewards, Sales and SOP', Gift],
   ['shortcuts', 'Workspace shortcuts', Zap],

@@ -9,6 +9,7 @@ import { Operations, SopLibrary, WorkspaceCopilot } from './pro-tools';
 import { DashboardActivity, RewardsActivity, SalesActivity } from './dashboard-activity';
 import { BrandingSettings, defaultCompany, defaultLogo } from './branding-settings';
 import { DashboardSettings, dashboardThemes } from './dashboard-settings';
+import { ActionCenter } from './action-center';
 import { DashboardCharts } from './dashboard-charts';
 import { hrPages } from '../lib/hr-pages';
 import { EngagementTools } from './engagement-tools';
@@ -182,6 +183,7 @@ export default function Workspace({ section, page }) {
         return <>
           {page === 'dashboard' && <DashboardHero company={company} data={data} onRecognise={() => setAction({ kind: 'Recognition' })} />}
           {page === 'dashboard' && visibility.metrics !== false && <Operations data={data} />}
+          {page === 'dashboard' && visibility.actions !== false && <ActionCenter data={data} />}
           {page === 'dashboard' && visibility.charts !== false && <DashboardCharts records={data.hrRecords?.attendance ?? hrPages.attendance.rows} />}
           {page === 'dashboard' && visibility.activity !== false && <DashboardActivity data={data} displayName={displayName} />}
           {page === 'dashboard' && visibility.shortcuts !== false && <WorkspaceShortcuts />}
